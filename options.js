@@ -92,6 +92,7 @@ function renderOrders() {
         <td class="due-cell ${dueLvl}">${esc(due)}</td>
         <td><span class="status-pill ${n.status}">${esc(O.STATUS_LABELS[n.status] || '')}</span></td>
         <td class="row-actions">
+          <button class="btn-mini" data-act="prev"${O.STATUSES.indexOf(n.status) <= 0 ? ' disabled' : ''}>← Back</button>
           <button class="btn-mini" data-act="next">Next →</button>
           <button class="btn-mini danger" data-act="archive">Archive</button>
         </td>
@@ -143,6 +144,11 @@ async function rowAction(noteId, act) {
       n.archived = true;
     } else {
       n.status = O.nextStatus(n.status);
+    }
+  } else if (act === 'prev') {
+    // 最初のステータス (received) では何もしない（disabled側で防いでいるが念のため）
+    if (O.STATUSES.indexOf(n.status) > 0) {
+      n.status = O.prevStatus(n.status);
     }
   } else if (act === 'archive') {
     n.archived = true;
@@ -237,7 +243,7 @@ function exportCSV() {
     showUpgrade();
     return;
   }
-  const filtered = applyExportFilter(state.notes, filter, state.query);
+  const filtered = O.applyExportFilter(state.notes, filter, state.query);
   if (filtered.length === 0) {
     showToast('No orders matched the filter');
     return;
@@ -249,47 +255,11 @@ function exportCSV() {
   showToast(`Exported ${filtered.length} orders`);
 }
 
-// 'all' / 'active' / 'shipped' / 'archived' / 'this-month' /
-// 'last-month' / 'last-3-months' / 'search' を受け取って絞り込む。
-function applyExportFilter(notes, filter, query) {
-  const today = new Date();
-  const ymThis = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
-  const lastMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-  const ymLast = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`;
-  const threeMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 2, 1);
-  const threeAgoISO = O.isoDate(threeMonthsAgo);
-
-  switch (filter) {
-    case 'active':
-      return notes.filter(n => O.isActive(n));
-    case 'shipped':
-      return notes.filter(n => !n.archived && n.status === 'shipped');
-    case 'archived':
-      return notes.filter(n => n.archived || n.status === 'review');
-    case 'this-month':
-      return notes.filter(n => n.dueDate && n.dueDate.startsWith(ymThis));
-    case 'last-month':
-      return notes.filter(n => n.dueDate && n.dueDate.startsWith(ymLast));
-    case 'last-3-months':
-      return notes.filter(n => n.dueDate && n.dueDate >= threeAgoISO);
-    case 'search':
-      if (!query) return notes;
-      const q = query.toLowerCase();
-      return notes.filter(n =>
-        (n.orderNo || '').toLowerCase().includes(q) ||
-        (n.customer || '').toLowerCase().includes(q) ||
-        (n.request || '').toLowerCase().includes(q)
-      );
-    default:
-      return notes;
-  }
-}
-
 function updateExportCount() {
   const sel = $('#export-filter');
   const out = $('#export-count');
   if (!sel || !out) return;
-  const n = applyExportFilter(state.notes, sel.value, state.query).length;
+  const n = O.applyExportFilter(state.notes, sel.value, state.query).length;
   out.textContent = `${n} order${n === 1 ? '' : 's'} will be exported with this filter.`;
 }
 

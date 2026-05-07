@@ -61,14 +61,69 @@ const screenshotsDir = join(__dirname, '..', 'screenshots');
 const cwsScreensDir = join(outDir, 'screenshots');
 mkdirSync(cwsScreensDir, { recursive: true });
 
-// 順序: 機能 → 課金（メモリ準拠）。5枚目に課金モーダル+"Yours forever" 訴求が最強。
-// キャプションは句読点なしで統一（メモリ準拠）。
+// 5枚のストーリー（ペルソナ会議 Marcus / Emily / CWSマーケ 統合結果）:
+//   1) 一覧で「これが何の拡張か」を一目で
+//   2) URL貼付で時短訴求
+//   3) Late フィルタで恐怖訴求 (買い手から不評を受ける前に)
+//   4) チェックリストで作り込み感とプロ感
+//   5) 課金モーダル + Yours forever
+// キャプションは <tspan> でキーワードのみアクセント色を入れる。
+// アクセント色: 青 #2563EB / 緑 #16A34A / 赤 #DC2626 (画面内の Late バッジと同色) 。
 const targets = [
-  { src: '05-list-with-orders.png', caption: 'One dashboard for every custom order',                     mode: 'popup' },
-  { src: '08-detail-view.png',      caption: 'Per-order checklists so nothing ships half-done',          mode: 'popup' },
-  { src: '04-url-parsed.png',       caption: 'Paste an order URL — buyer details auto-fill',             mode: 'popup' },
-  { src: '09-dark-mode.png',        caption: 'Dark mode included — your data stays on your device',      mode: 'popup' },
-  { src: '10-upgrade-modal.png',    caption: '$12.99 once  ·  Yours forever  ·  No subscription',        mode: 'popup' }
+  {
+    src: '05-list-with-orders.png',
+    captionParts: [
+      { text: 'Track ' },
+      { text: 'every custom order', color: '#2563EB' },
+      { text: ' in one place' }
+    ],
+    mode: 'popup'
+  },
+  {
+    src: '04-url-parsed.png',
+    captionParts: [
+      { text: 'Paste URL. Order # ' },
+      { text: 'auto-filled', color: '#16A34A' },
+      { text: '.' }
+    ],
+    mode: 'popup'
+  },
+  {
+    src: '07-filter-late.png',
+    captionParts: [
+      { text: 'See what’s ' },
+      { text: 'late', color: '#DC2626' },
+      { text: ' before buyers do.' }
+    ],
+    mode: 'popup'
+  },
+  {
+    // 4枚目: チェックリストではなく CSV エクスポート画面に差し替え。
+    // 「画面だけ見ると有料版しかなく見える / CSV エクスポート機能が伝わらない」
+    // というオーナー指摘に対応。Free バッジと Free ピル付きの options 画面で
+    // 「Free でデータ持ち出し可能」を一目で示す。
+    src: '12-options-data.png',
+    captionParts: [
+      { text: 'Export your data anytime — ' },
+      { text: 'Free', color: '#16A34A' }
+    ],
+    mode: 'fullscreen'
+  },
+  {
+    src: '10-upgrade-modal.png',
+    // "Pro:" の接頭辞で「これは Pro の話」を明示し、
+    // 4枚目の Free 訴求と対比を作る。
+    captionParts: [
+      { text: '' },
+      { text: 'Pro:', color: '#2563EB' },
+      { text: ' ' },
+      { text: '$12.99', color: '#16A34A' },
+      { text: ' once · Yours ' },
+      { text: 'forever', color: '#2563EB' }
+    ],
+    mode: 'popup',
+    big: true
+  }
 ];
 
 if (!existsSync(screenshotsDir)) {
@@ -101,7 +156,21 @@ if (!existsSync(screenshotsDir)) {
     }
     const popupMeta = await sharp(popupBuffer).metadata();
 
-    const captionEsc = t.caption.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // キャプション SVG: tspan でキーワード着色。
+    // フォントは sharp/libvips 互換のため Arial 系（メモリ準拠）。
+    // 上部に白95%透過マスクを敷いてダークネイビーのテキストを乗せる（黒帯はダサい）。
+    const fontSize = t.big ? 58 : 52;
+    const fontWeight = t.big ? 900 : 800;
+    const bandHeight = t.big ? 130 : 110;
+    const bandY = bandHeight / 2 + 12;  // 中央寄せ調整
+    const escText = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const tspans = (t.captionParts || []).map(p => {
+      const txt = escText(p.text);
+      return p.color
+        ? `<tspan fill="${p.color}">${txt}</tspan>`
+        : txt;
+    }).join('');
+
     const compositeSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800">
   <defs>
@@ -111,13 +180,14 @@ if (!existsSync(screenshotsDir)) {
     </linearGradient>
   </defs>
   <rect x="0" y="0" width="1280" height="800" fill="url(#bg)"/>
-  <rect x="0" y="0" width="1280" height="110" fill="#000" opacity="0.28"/>
-  <text x="640" y="68" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" fill="#fff">${captionEsc}</text>
+  <rect x="0" y="0" width="1280" height="${bandHeight}" fill="#ffffff" opacity="0.95"/>
+  <rect x="0" y="${bandHeight - 1}" width="1280" height="1" fill="#e5e7eb"/>
+  <text x="640" y="${bandY}" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="${fontSize}" font-weight="${fontWeight}" fill="#0F172A">${tspans}</text>
 </svg>`;
 
     const bgBuffer = await sharp(Buffer.from(compositeSvg)).png().toBuffer();
 
-    const availTop = 120;
+    const availTop = bandHeight + 20;
     const availBottom = 790;
     const availHeight = availBottom - availTop;
     const popupTop = availTop + Math.max(0, (availHeight - (popupMeta.height || 0)) / 2);
@@ -126,9 +196,24 @@ if (!existsSync(screenshotsDir)) {
     const outBaseName = `screenshot-${i + 1}-1280x800`;
     const popupOutPath = join(cwsScreensDir, `${outBaseName}-popup.png`);
 
-    await sharp(popupBuffer).toFile(popupOutPath);
+    // popup を角丸 + ドロップシャドウ付きで合成（プロ感、Emily指摘）
+    const w = popupMeta.width || 380;
+    const h = popupMeta.height || 700;
+    const radius = 12;
+    const roundedMaskSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect x="0" y="0" width="${w}" height="${h}" rx="${radius}" ry="${radius}" fill="#fff"/></svg>`;
+    const roundedPopup = await sharp(popupBuffer)
+      .composite([{ input: Buffer.from(roundedMaskSvg), blend: 'dest-in' }])
+      .png()
+      .toBuffer();
+
+    await sharp(roundedPopup).toFile(popupOutPath);
+
+    // 影は背景より大きくなるとsharpが composite エラーを出すため、
+    // 角丸のみで素直に配置する（背景グラデーションが既に立体感を作る）。
     await sharp(bgBuffer)
-      .composite([{ input: popupBuffer, top: Math.round(popupTop), left: Math.round(popupLeft) }])
+      .composite([
+        { input: roundedPopup, top: Math.round(popupTop), left: Math.round(popupLeft) }
+      ])
       .png()
       .toFile(join(cwsScreensDir, `${outBaseName}.png`));
 
@@ -140,8 +225,9 @@ if (!existsSync(screenshotsDir)) {
     </linearGradient>
   </defs>
   <rect x="0" y="0" width="1280" height="800" fill="url(#bg-${i + 1})"/>
-  <rect x="0" y="0" width="1280" height="110" fill="#000" opacity="0.28"/>
-  <text x="640" y="68" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" fill="#fff">${captionEsc}</text>
+  <rect x="0" y="0" width="1280" height="${bandHeight}" fill="#ffffff" opacity="0.95"/>
+  <rect x="0" y="${bandHeight - 1}" width="1280" height="1" fill="#e5e7eb"/>
+  <text x="640" y="${bandY}" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="${fontSize}" font-weight="${fontWeight}" fill="#0F172A">${tspans}</text>
   <image xlink:href="${outBaseName}-popup.png" x="${Math.round(popupLeft)}" y="${Math.round(popupTop)}" width="${popupMeta.width}" height="${popupMeta.height}"/>
 </svg>`;
     writeFileSync(join(cwsScreensDir, `${outBaseName}.svg`), svgVersion);

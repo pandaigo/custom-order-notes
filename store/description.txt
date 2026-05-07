@@ -20,7 +20,8 @@ WHAT IT DOES
 • Filter by Today / Late / Ship to focus on what matters this morning.
 
 FREE PLAN INCLUDES
-• Up to 10 active orders.
+• Up to 10 active orders (Received / Making / Packing / Review). Shipped
+  orders are auto-archived and don't count toward the limit.
 • Full CSV import (drop in your Etsy / Shopify export).
 • All-orders CSV export — your data is yours, not held hostage.
 • JSON full backup and restore — move between PCs anytime.

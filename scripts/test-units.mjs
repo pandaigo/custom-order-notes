@@ -57,16 +57,18 @@ eq(O.prevStatus('making'), 'received', 'making -> received');
 eq(O.prevStatus('received'), 'received', 'received stays at received (terminal)');
 
 console.log('\n[order-utils] isActive / countActive');
+// 案C: review は active、shipped のみ完了扱い (Marcus/Emily 一致)
 const sample = [
   { id: 'a', status: 'received', archived: false },
   { id: 'b', status: 'making', archived: false },
   { id: 'c', status: 'shipped', archived: false },     // shipped excluded
-  { id: 'd', status: 'review', archived: false },      // review excluded
+  { id: 'd', status: 'review', archived: false },      // review IS active (案C)
   { id: 'e', status: 'making', archived: true },       // archived excluded
 ];
-eq(O.countActive(sample), 2, 'countActive counts only non-shipped non-archived');
+eq(O.countActive(sample), 3, 'countActive: received/making/review = 3 (案C)');
 truthy(O.isActive(sample[0]), 'received is active');
 truthy(!O.isActive(sample[2]), 'shipped is NOT active');
+truthy(O.isActive(sample[3]), 'review IS active (案C)');
 truthy(!O.isActive(sample[4]), 'archived is NOT active');
 
 console.log('\n[order-utils] dueLevel');
@@ -118,9 +120,203 @@ eq(parsedBack[0].customer, 'A, B', 'roundtrip customer with comma');
 eq(parsedBack[0].request, 'a "quoted" word\nnewline', 'roundtrip request with quotes/newline');
 
 console.log('\n[csv-utils] CSV injection prevention');
-const evil = [{ orderNo: '=cmd|"calc"!A0', customer: 'foo' }];
-const evilOut = C.notesToCSV(evil);
-truthy(evilOut.includes("'=cmd"), 'leading = is escaped with apostrophe');
+{
+  const evil = [{ orderNo: '=cmd|"calc"!A0', customer: 'foo' }];
+  truthy(C.notesToCSV(evil).includes("'=cmd"), 'leading = is escaped');
+  truthy(C.notesToCSV([{ orderNo: '+attack' }]).includes("'+attack"), 'leading + is escaped');
+  truthy(C.notesToCSV([{ orderNo: '-attack' }]).includes("'-attack"), 'leading - is escaped');
+  truthy(C.notesToCSV([{ orderNo: '@attack' }]).includes("'@attack"), 'leading @ is escaped');
+  truthy(C.notesToCSV([{ orderNo: '\tattack' }]).includes("'\tattack"), 'leading TAB is escaped');
+  truthy(C.notesToCSV([{ orderNo: '\rattack' }]).includes("'\rattack"), 'leading CR is escaped');
+  truthy(!C.notesToCSV([{ orderNo: 'safe' }]).includes("'safe"), 'safe value is NOT escaped');
+}
+
+// ---------- ここから追加カバレッジ ----------
+
+console.log('\n[order-utils] parseOrderUrl - 追加境界');
+eq(O.parseOrderUrl('HTTPS://WWW.ETSY.COM/your/orders/sold/3987654321'),
+   { platform: 'etsy', orderNo: '3987654321' }, 'Etsy 大文字混在スキーム');
+eq(O.parseOrderUrl('https://www.etsy.com/your/orders/sold/12345'),
+   null, 'Etsy 5桁は拒否（最低6桁）');
+eq(O.parseOrderUrl('https://www.etsy.com/your/orders/sold/123456'),
+   { platform: 'etsy', orderNo: '123456' }, 'Etsy 6桁は受理');
+eq(O.parseOrderUrl('   https://www.etsy.com/your/orders/sold/3987654321   '),
+   { platform: 'etsy', orderNo: '3987654321' }, '前後空白はトリム');
+eq(O.parseOrderUrl(undefined), null, 'undefined入力で null');
+eq(O.parseOrderUrl(123), null, '数値入力で null（または string化して照合）'); // 123は文字列化しても URL ではないので null
+eq(O.parseOrderUrl('https://www.etsy.com/listing/12345/foo'),
+   null, 'Etsy 商品ページURLは拒否（注文ではない）');
+
+console.log('\n[order-utils] nextStatus / prevStatus - 全遷移');
+eq(O.nextStatus('received'),  'making',   'received->making');
+eq(O.nextStatus('making'),    'packing',  'making->packing');
+eq(O.nextStatus('packing'),   'shipped',  'packing->shipped');
+eq(O.nextStatus('shipped'),   'review',   'shipped->review');
+eq(O.nextStatus('review'),    'review',   'review->review (terminal)');
+eq(O.prevStatus('received'),  'received', 'received->received (terminal)');
+eq(O.prevStatus('making'),    'received', 'making->received');
+eq(O.prevStatus('packing'),   'making',   'packing->making');
+eq(O.prevStatus('shipped'),   'packing',  'shipped->packing');
+eq(O.prevStatus('review'),    'shipped',  'review->shipped');
+eq(O.nextStatus('UNKNOWN'),   'UNKNOWN',  'unknown next stays');
+eq(O.prevStatus('UNKNOWN'),   'UNKNOWN',  'unknown prev stays');
+
+console.log('\n[order-utils] STATUSES 順序とラベル');
+eq(O.STATUSES, ['received', 'making', 'packing', 'shipped', 'review'], 'STATUSES 5段階の順序');
+eq(O.STATUS_LABELS.received, 'Received', 'label received');
+eq(O.STATUS_LABELS.review,   'Review',   'label review');
+
+console.log('\n[order-utils] isActive - エッジ');
+truthy(!O.isActive(null), 'null は active ではない');
+truthy(!O.isActive(undefined), 'undefined は active ではない');
+truthy(O.isActive({ status: 'review', archived: false }), 'review は active (案C)');
+truthy(!O.isActive({ status: 'shipped', archived: false }), 'shipped は active ではない (案C)');
+truthy(O.isActive({ status: 'packing', archived: false }), 'packing は active');
+truthy(!O.isActive({ status: 'making', archived: true }), 'archived は active ではない');
+
+console.log('\n[order-utils] countActive - エッジ');
+eq(O.countActive([]), 0, '空配列で 0');
+eq(O.countActive([{ status: 'shipped', archived: false }]), 0, '全 shipped で 0');
+eq(O.countActive([
+  { status: 'received', archived: false },
+  { status: 'making', archived: false },
+  { status: 'packing', archived: false }
+]), 3, '全 active で 3');
+
+console.log('\n[order-utils] dueLevel - 境界値');
+const D = '2026-05-07';
+eq(O.dueLevel({ status: 'making', archived: false, dueDate: '2026-05-06' }, D), 'overdue', '前日 = overdue');
+eq(O.dueLevel({ status: 'making', archived: false, dueDate: '2026-05-08' }, D), 'soon',    '翌日 = soon');
+eq(O.dueLevel({ status: 'making', archived: false, dueDate: '2026-05-10' }, D), 'soon',    '+3日 = soon');
+eq(O.dueLevel({ status: 'making', archived: false, dueDate: '2026-05-11' }, D), 'future',  '+4日 = future');
+eq(O.dueLevel({ archived: true, status: 'making', dueDate: '2026-05-05' }, D),  'none',    'archived は none');
+eq(O.dueLevel(null, D), 'none', 'null note は none');
+
+console.log('\n[order-utils] isoDate - ゼロ埋め');
+eq(O.isoDate(new Date(2026, 0, 5)),  '2026-01-05', '1月5日 -> ゼロ埋め');
+eq(O.isoDate(new Date(2026, 11, 31)), '2026-12-31', '12月31日');
+
+console.log('\n[order-utils] newId - 一意性');
+{
+  const seen = new Set();
+  let collision = 0;
+  for (let i = 0; i < 5000; i++) {
+    const id = O.newId();
+    if (seen.has(id)) collision++;
+    seen.add(id);
+  }
+  eq(collision, 0, '5000回連続生成で衝突なし');
+  truthy(O.newId().startsWith('n_'), 'newId プレフィックス n_');
+}
+
+console.log('\n[order-utils] defaultChecklist');
+{
+  const cl = O.defaultChecklist();
+  eq(cl.length, 5, 'プリセット5項目');
+  truthy(cl.every(x => typeof x.text === 'string' && typeof x.done === 'boolean'),
+         '各項目に text と done');
+  truthy(cl.every(x => x.done === false), '初期は全 done=false');
+  // mutate しても次の呼び出しは独立であること
+  cl[0].done = true;
+  eq(O.defaultChecklist()[0].done, false, '次の呼出は独立 (深い参照共有なし)');
+}
+
+console.log('\n[order-utils] applyExportFilter - 各フィルタ');
+{
+  const today = new Date(2026, 4, 7); // 2026-05-07 ローカル
+  const ds = (y, m, d) => O.isoDate(new Date(y, m, d));
+  const data = [
+    { id: 'a', status: 'received', archived: false, dueDate: ds(2026, 4, 7),  customer: 'Alice', orderNo: '111', request: 'engrave' }, // this month
+    { id: 'b', status: 'making',   archived: false, dueDate: ds(2026, 4, 15), customer: 'Bob',   orderNo: '222', request: 'rush' },     // this month
+    { id: 'c', status: 'shipped',  archived: false, dueDate: ds(2026, 3, 20), customer: 'Carol', orderNo: '333', request: 'std' },     // last month
+    { id: 'd', status: 'review',   archived: false, dueDate: ds(2026, 2, 5),  customer: 'Dave',  orderNo: '444', request: '' },        // 2 months ago
+    { id: 'e', status: 'making',   archived: true,  dueDate: ds(2026, 4, 1),  customer: 'Eve',   orderNo: '555', request: 'archived' }
+  ];
+  eq(O.applyExportFilter(data, 'all', '', today).length, 5, 'all = 5件');
+  // 案C: review も active カウント、shipped のみ完了扱い
+  eq(O.applyExportFilter(data, 'active', '', today).map(n => n.id), ['a', 'b', 'd'], 'active = received/making/review (案C)');
+  eq(O.applyExportFilter(data, 'shipped', '', today).map(n => n.id), ['c'], 'shipped = c のみ');
+  // 案C: archived は archived フラグ true のみ。review は active 扱い
+  eq(O.applyExportFilter(data, 'archived', '', today).map(n => n.id).sort(), ['e'], 'archived = archived フラグ true のみ (案C)');
+  // this-month は archived も含めて dueDate が今月のものを返す（仕様）
+  eq(O.applyExportFilter(data, 'this-month', '', today).map(n => n.id).sort(), ['a', 'b', 'e'], 'this-month (archived も含む)');
+  eq(O.applyExportFilter(data, 'last-month', '', today).map(n => n.id), ['c'], 'last-month');
+  eq(O.applyExportFilter(data, 'last-3-months', '', today).map(n => n.id).sort(), ['a','b','c','d','e'], 'last-3-months 全部入る');
+  eq(O.applyExportFilter(data, 'search', 'rush', today).map(n => n.id), ['b'], 'search = b');
+  eq(O.applyExportFilter(data, 'search', 'BOB', today).map(n => n.id), ['b'], 'search 大文字無視');
+  eq(O.applyExportFilter(data, 'search', '', today).length, 5, 'search クエリ空 = 全件');
+  eq(O.applyExportFilter([], 'all', '', today).length, 0, '空配列入力で 0');
+  eq(O.applyExportFilter(null, 'all', '', today).length, 0, 'null 入力で 0');
+  eq(O.applyExportFilter(data, 'unknown-filter', '', today).length, 5, '未知 filter は全件 (default)');
+}
+
+console.log('\n[csv-utils] parseCSV - エッジ');
+eq(C.parseCSV('').length, 0, '空CSVは 0行');
+eq(C.parseCSV('Order,Buyer\n').length, 0, 'ヘッダーのみは 0行');
+{
+  // CRLF
+  const r = C.parseCSV('Order,Buyer\r\n111,Alice\r\n222,Bob');
+  eq(r.length, 2, 'CRLF で 2行');
+  eq(r[0]['order'], '111', 'CRLF parse OK');
+}
+{
+  // 末尾に改行なし
+  const r = C.parseCSV('Order,Buyer\n111,Alice');
+  eq(r.length, 1, '末尾改行なしでも 1行');
+}
+{
+  // quoted セル内の改行・カンマ・クォート
+  const r = C.parseCSV('A,B\n"a, b","line1\nline2"\n"esc ""quote""",second');
+  eq(r[0]['a'], 'a, b', 'quoted カンマ');
+  eq(r[0]['b'], 'line1\nline2', 'quoted 改行');
+  eq(r[1]['a'], 'esc "quote"', 'エスケープされた quote');
+}
+
+console.log('\n[csv-utils] normalizeOrderRow - 列名バリエーション');
+{
+  const cases = [
+    [{ 'order id': '111', 'buyer': 'A' }, { orderNo: '111', customer: 'A' }],
+    [{ 'order number': '222', 'customer': 'B' }, { orderNo: '222', customer: 'B' }],
+    [{ 'order #': '333', 'ship name': 'C' }, { orderNo: '333', customer: 'C' }],
+    [{ 'name': '#444', 'full name': 'D' }, { orderNo: '444', customer: 'D' }], // # 除去
+    // # プレフィックスなしの数値だけだと、'name' は orderNo に流れるが platform 判定までは
+    // 行わない（実装の意図的な限界）。manual のままで良い。
+    [{ 'name': '5123456789' }, { orderNo: '5123456789', platform: 'manual' }]
+  ];
+  for (const [row, expect] of cases) {
+    const got = C.normalizeOrderRow(row);
+    truthy(got, `normalize ${JSON.stringify(row)}`);
+    if (expect.orderNo) eq(got.orderNo, expect.orderNo, `  -> orderNo ${expect.orderNo}`);
+    if (expect.customer) eq(got.customer, expect.customer, `  -> customer ${expect.customer}`);
+    if (expect.platform) eq(got.platform, expect.platform, `  -> platform ${expect.platform}`);
+  }
+  eq(C.normalizeOrderRow({ 'foo': 'bar' }), null, 'orderNo列がない -> null');
+}
+
+console.log('\n[csv-utils] normalizeDate - 不正format');
+eq(C.normalizeDate('not a date'), null, '不正文字列は null');
+eq(C.normalizeDate(null), null, 'null は null');
+eq(C.normalizeDate(undefined), null, 'undefined は null');
+eq(C.normalizeDate('2026-1-5'),  '2026-01-05', '月日1桁 ISO もゼロ埋め');
+eq(C.normalizeDate('1/5/2026'),  '2026-01-05', 'US 月日1桁');
+eq(C.normalizeDate('5.1.2026'),  '2026-01-05', 'EU 月日1桁');
+
+console.log('\n[csv-utils] pickFirst');
+eq(C.pickFirst({ a: '', b: 'X', c: 'Y' }, ['a', 'b', 'c']), 'X', '空をスキップして次');
+eq(C.pickFirst({ a: '  ', b: 'X' }, ['a', 'b']), 'X', '空白のみは空扱い');
+eq(C.pickFirst({}, ['a', 'b']), '', '全部なし -> 空文字');
+eq(C.pickFirst({ a: 'first' }, ['a', 'b']), 'first', '一致したらそこで停止');
+
+console.log('\n[csv-utils] notesToCSV - エッジ');
+{
+  const empty = C.notesToCSV([]);
+  truthy(empty.startsWith('orderNo,'), '空配列でもヘッダー出力');
+  // undefined フィールド
+  const partial = C.notesToCSV([{ orderNo: 'X' }]);
+  const lines = partial.split(/\r?\n/);
+  eq(lines.length, 2, '1件 = 2行（ヘッダ+データ）');
+  truthy(lines[1].startsWith('X,'), 'orderNo は出る、他は空');
+}
 
 console.log(`\n=== Result ===`);
 console.log(`Pass: ${pass} / Fail: ${fail}`);
