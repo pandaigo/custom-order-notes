@@ -47,6 +47,7 @@ function renderAll() {
   $('#paid-pill').textContent = state.isPaid ? 'PRO' : '';
   renderOrders();
   renderArchive();
+  updateExportCount();
 }
 
 function renderOrders() {
@@ -230,8 +231,62 @@ async function confirmImport() {
 // ---------- CSV export ----------
 
 function exportCSV() {
-  const csv = C.notesToCSV(state.notes);
-  downloadFile('custom-order-notes.csv', csv, 'text/csv');
+  const sel = $('#export-filter');
+  const filter = (sel && sel.value) || 'all';
+  const filtered = applyExportFilter(state.notes, filter, state.query);
+  if (filtered.length === 0) {
+    showToast('No orders matched the filter');
+    return;
+  }
+  const csv = C.notesToCSV(filtered);
+  const today = O.isoDate(new Date());
+  const suffix = filter === 'all' ? '' : `-${filter}`;
+  downloadFile(`custom-order-notes-${today}${suffix}.csv`, csv, 'text/csv');
+  showToast(`Exported ${filtered.length} orders`);
+}
+
+// 'all' / 'active' / 'shipped' / 'archived' / 'this-month' /
+// 'last-month' / 'last-3-months' / 'search' を受け取って絞り込む。
+function applyExportFilter(notes, filter, query) {
+  const today = new Date();
+  const ymThis = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+  const lastMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const ymLast = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`;
+  const threeMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 2, 1);
+  const threeAgoISO = O.isoDate(threeMonthsAgo);
+
+  switch (filter) {
+    case 'active':
+      return notes.filter(n => O.isActive(n));
+    case 'shipped':
+      return notes.filter(n => !n.archived && n.status === 'shipped');
+    case 'archived':
+      return notes.filter(n => n.archived || n.status === 'review');
+    case 'this-month':
+      return notes.filter(n => n.dueDate && n.dueDate.startsWith(ymThis));
+    case 'last-month':
+      return notes.filter(n => n.dueDate && n.dueDate.startsWith(ymLast));
+    case 'last-3-months':
+      return notes.filter(n => n.dueDate && n.dueDate >= threeAgoISO);
+    case 'search':
+      if (!query) return notes;
+      const q = query.toLowerCase();
+      return notes.filter(n =>
+        (n.orderNo || '').toLowerCase().includes(q) ||
+        (n.customer || '').toLowerCase().includes(q) ||
+        (n.request || '').toLowerCase().includes(q)
+      );
+    default:
+      return notes;
+  }
+}
+
+function updateExportCount() {
+  const sel = $('#export-filter');
+  const out = $('#export-count');
+  if (!sel || !out) return;
+  const n = applyExportFilter(state.notes, sel.value, state.query).length;
+  out.textContent = `${n} order${n === 1 ? '' : 's'} will be exported with this filter.`;
 }
 
 // ---------- JSON backup ----------
@@ -391,6 +446,7 @@ function bindEvents() {
   });
 
   $('#btn-csv-export').addEventListener('click', exportCSV);
+  $('#export-filter').addEventListener('change', updateExportCount);
   $('#btn-json-export').addEventListener('click', exportJSON);
   $('#btn-json-import').addEventListener('click', () => $('#json-file').click());
   $('#json-file').addEventListener('change', (e) => {

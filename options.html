@@ -73,8 +73,21 @@
 
       <div class="card">
         <h3>CSV export</h3>
-        <p class="muted">Download all orders (active + archived) as CSV.</p>
-        <button id="btn-csv-export" class="btn-primary">Export CSV</button>
+        <p class="muted">Pick which orders to export. The CSV opens in Excel, Google Sheets, or your bookkeeping tool.</p>
+        <div class="export-row">
+          <select id="export-filter" class="export-filter">
+            <option value="all">All orders (active + archived)</option>
+            <option value="active">Active only (Received / Making / Packing)</option>
+            <option value="shipped">Shipped only</option>
+            <option value="archived">Archived only</option>
+            <option value="this-month">This month (by due date)</option>
+            <option value="last-month">Last month (by due date)</option>
+            <option value="last-3-months">Last 3 months (by due date)</option>
+            <option value="search">Match current Search filter</option>
+          </select>
+          <button id="btn-csv-export" class="btn-primary">Export CSV</button>
+        </div>
+        <p class="muted small" id="export-count"></p>
       </div>
 
       <div class="card">
@@ -100,14 +113,6 @@
         <h3>About</h3>
         <p>Custom Order Notes keeps every buyer request, deadline, and status in one place — entirely on your device. No account. No cloud sync. No subscription.</p>
         <p class="muted small">Compatible with Etsy, Shopify, Amazon Handmade, eBay, and any marketplace where you handle custom orders.</p>
-      </div>
-      <div class="card">
-        <h3>Also by this developer</h3>
-        <ul class="related">
-          <li><strong>QuickReply Templates</strong> — canned responses & text expander</li>
-          <li><strong>Watermark Express</strong> — bulk image watermark</li>
-          <li><strong>Quick Contact Notes</strong> — personal CRM with reminders</li>
-        </ul>
       </div>
       <div class="card">
         <h3>Pro version</h3>

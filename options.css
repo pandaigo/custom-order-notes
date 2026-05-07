@@ -238,6 +238,29 @@ body {
   flex-wrap: wrap;
 }
 
+.export-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.export-filter {
+  flex: 1;
+  min-width: 220px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+
+.export-filter:focus { border-color: var(--primary); }
+
 .btn-primary {
   padding: 8px 16px;
   background: var(--primary);
