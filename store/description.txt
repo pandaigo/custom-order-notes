@@ -19,10 +19,16 @@ WHAT IT DOES
 • Search by order #, buyer name, or request text.
 • Filter by Today / Late / Ship to focus on what matters this morning.
 
+FREE PLAN INCLUDES
+• Up to 10 active orders.
+• Full CSV import (drop in your Etsy / Shopify export).
+• All-orders CSV export — your data is yours, not held hostage.
+• JSON full backup and restore — move between PCs anytime.
+
 PRO ($12.99 ONE-TIME)
-• Unlimited active orders (Free tracks up to 10).
-• CSV import — drop in your Etsy or Shopify order export.
-• CSV & JSON export — download a full backup any time.
+• Unlimited active orders.
+• Filtered CSV export by month, status, or search — built for monthly
+  bookkeeping, sales tax filing, and per-period reports.
 • All future updates included.
 
 WHO IT'S FOR

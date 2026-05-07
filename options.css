@@ -261,6 +261,20 @@ body {
 
 .export-filter:focus { border-color: var(--primary); }
 
+.pill-free {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+  padding: 2px 7px;
+  background: var(--bg-alt);
+  color: var(--text-soft);
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
 .btn-primary {
   padding: 8px 16px;
   background: var(--primary);

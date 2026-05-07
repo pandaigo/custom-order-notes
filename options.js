@@ -162,11 +162,8 @@ async function rowAction(noteId, act) {
 // ---------- CSV import ----------
 
 async function handleCsvFile(file) {
-  if (!state.isPaid) {
-    showToast('CSV import requires Pro');
-    showUpgrade();
-    return;
-  }
+  // CSV import は Free でも実行可能。Free 上限超過時は通常の追加と同じく
+  // 11件目で upgrade モーダルが出る（既存ロジック）。
   const text = await file.text();
   const rawRows = C.parseCSV(text);
   if (rawRows.length === 0) {
@@ -233,6 +230,13 @@ async function confirmImport() {
 function exportCSV() {
   const sel = $('#export-filter');
   const filter = (sel && sel.value) || 'all';
+  // 全件エクスポートは Free 可、月別/状態別/検索フィルタは Pro 限定。
+  // 「データ持ち出し権は人権、業務効率は課金」の境界 (案3, 3名一致)。
+  if (filter !== 'all' && !state.isPaid) {
+    showToast('Filtered export is a Pro feature');
+    showUpgrade();
+    return;
+  }
   const filtered = applyExportFilter(state.notes, filter, state.query);
   if (filtered.length === 0) {
     showToast('No orders matched the filter');

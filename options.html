@@ -64,26 +64,26 @@
     <!-- Data -->
     <section id="tab-data" class="tab-panel hidden">
       <div class="card">
-        <h3>CSV import</h3>
+        <h3>CSV import <span class="pill-free">Free</span></h3>
         <p class="muted">Drop a CSV exported from Etsy (Sold Orders) or Shopify (Orders Export). Column names are matched automatically.</p>
         <input type="file" id="csv-file" accept=".csv,text/csv">
         <div id="csv-preview" class="muted hidden"></div>
-        <p class="muted small">Free plan can import up to 10 active orders. Pro: unlimited.</p>
+        <p class="muted small">Free can import — but the active limit is 10. Hitting the limit prompts an optional upgrade.</p>
       </div>
 
       <div class="card">
         <h3>CSV export</h3>
-        <p class="muted">Pick which orders to export. The CSV opens in Excel, Google Sheets, or your bookkeeping tool.</p>
+        <p class="muted">All-orders export is Free. Filtered export by month / status / search is Pro — built for monthly bookkeeping.</p>
         <div class="export-row">
           <select id="export-filter" class="export-filter">
-            <option value="all">All orders (active + archived)</option>
-            <option value="active">Active only (Received / Making / Packing)</option>
-            <option value="shipped">Shipped only</option>
-            <option value="archived">Archived only</option>
-            <option value="this-month">This month (by due date)</option>
-            <option value="last-month">Last month (by due date)</option>
-            <option value="last-3-months">Last 3 months (by due date)</option>
-            <option value="search">Match current Search filter</option>
+            <option value="all">All orders (active + archived) — Free</option>
+            <option value="active">Active only (Received / Making / Packing) — Pro</option>
+            <option value="shipped">Shipped only — Pro</option>
+            <option value="archived">Archived only — Pro</option>
+            <option value="this-month">This month (by due date) — Pro</option>
+            <option value="last-month">Last month (by due date) — Pro</option>
+            <option value="last-3-months">Last 3 months (by due date) — Pro</option>
+            <option value="search">Match current Search filter — Pro</option>
           </select>
           <button id="btn-csv-export" class="btn-primary">Export CSV</button>
         </div>
@@ -91,8 +91,8 @@
       </div>
 
       <div class="card">
-        <h3>JSON full backup</h3>
-        <p class="muted">Download or restore a full snapshot — useful for moving between PCs (no cloud needed).</p>
+        <h3>JSON full backup <span class="pill-free">Free</span></h3>
+        <p class="muted">Download or restore a full snapshot — useful for moving between PCs (no cloud needed). Always available, regardless of plan.</p>
         <div class="row-buttons">
           <button id="btn-json-export" class="btn-primary">Download backup</button>
           <input type="file" id="json-file" accept=".json,application/json" hidden>
