@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome — Custom Order Notes</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #f7f9fc;
+      color: #1a1a2e;
+      margin: 0;
+      padding: 48px 20px;
+      line-height: 1.6;
+    }
+    .wrap { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 28px; margin-bottom: 6px; }
+    .lede { color: #555; margin-bottom: 24px; font-size: 15px; }
+    .step {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .step-no {
+      width: 28px; height: 28px; flex: 0 0 28px;
+      background: #4a90d9; color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px;
+    }
+    .step h3 { font-size: 15px; margin-bottom: 4px; }
+    .step p { font-size: 13px; color: #555; }
+    .cta { margin-top: 20px; }
+    .btn {
+      display: inline-block;
+      padding: 10px 22px;
+      background: #4a90d9;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #1c1f26; color: #f1f5f9; }
+      .step { background: #232730; border-color: #2f343f; }
+      .step p, .lede { color: #cbd5e1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Custom Order Notes</h1>
+    <p class="lede">Track every buyer request, deadline, and status — all on your device. Three steps to get started.</p>
+
+    <div class="step">
+      <div class="step-no">1</div>
+      <div>
+        <h3>Click the toolbar icon to open the popup</h3>
+        <p>Pin Custom Order Notes for one-click access (puzzle icon → pin).</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-no">2</div>
+      <div>
+        <h3>Add your first order</h3>
+        <p>Paste an Etsy or Shopify order URL — order # and platform are filled in automatically. Or type details manually.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-no">3</div>
+      <div>
+        <h3>Set a due date and let reminders do the rest</h3>
+        <p>You'll get a desktop notification on the morning of the due date. Tick off the checklist as you go.</p>
+      </div>
+    </div>
+
+    <div class="cta">
+      <a href="options.html" class="btn">Open all settings →</a>
+    </div>
+  </div>
+</body>
+</html>

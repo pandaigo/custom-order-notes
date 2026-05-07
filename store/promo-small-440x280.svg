@@ -1,0 +1,36 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 280">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a"/>
+      <stop offset="55%" style="stop-color:#3a4ca8"/>
+      <stop offset="100%" style="stop-color:#4a5ad9"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="440" height="280" fill="url(#bg)"/>
+
+  <!-- 左下: クリップボード装飾 -->
+  <g opacity="0.92">
+    <rect x="22" y="178" width="80" height="76" rx="6" fill="#fff"/>
+    <rect x="50" y="172" width="24" height="10" rx="2" fill="#fff" stroke="#1e3a8a" stroke-width="1.5"/>
+    <circle cx="36" cy="200" r="4" fill="#4a90d9"/>
+    <path d="M33.5 200 L35.5 202 L38.5 197" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    <rect x="44" y="197" width="46" height="4" rx="2" fill="#cfdde9"/>
+    <circle cx="36" cy="218" r="4" fill="#4a90d9"/>
+    <path d="M33.5 218 L35.5 220 L38.5 215" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    <rect x="44" y="215" width="40" height="4" rx="2" fill="#cfdde9"/>
+    <circle cx="36" cy="236" r="4" fill="none" stroke="#cfdde9" stroke-width="1.5"/>
+    <rect x="44" y="233" width="44" height="4" rx="2" fill="#e6edf4"/>
+  </g>
+
+  <!-- 主見出し -->
+  <text x="220" y="92" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="900" fill="#fff" letter-spacing="-1">Save Every</text>
+  <text x="220" y="138" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="900" fill="#fff" letter-spacing="-1">Custom Order</text>
+
+  <!-- 差し色1点: "No" だけ赤、Subscription は白 -->
+  <text x="220" y="186" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="900" letter-spacing="-0.5" xml:space="preserve"><tspan fill="#FF6B4A">No </tspan><tspan fill="#fff">Subscription</tspan></text>
+
+  <!-- 補助コピー -->
+  <text x="220" y="224" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#cbd5e1" letter-spacing="0.3">Buy once  ·  Yours forever</text>
+</svg>

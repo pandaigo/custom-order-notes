@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="main-view">
+    <header>
+      <div class="header-left">
+        <img src="icons/icon48.png" alt="" width="22" height="22">
+        <h1>Custom Order Notes</h1>
+      </div>
+      <div class="header-right">
+        <button id="btn-options" class="btn-icon-ghost" title="Open all orders / settings">⚙</button>
+      </div>
+    </header>
+
+    <div class="search-row">
+      <input id="search" type="search" placeholder="Search order # or buyer..." autocomplete="off">
+      <span id="quota-badge" class="quota-badge"></span>
+    </div>
+
+    <div class="filter-row" id="filter-row">
+      <button class="chip active" data-filter="all">All <span class="chip-count" data-count="all">0</span></button>
+      <button class="chip" data-filter="today">Today <span class="chip-count" data-count="today">0</span></button>
+      <button class="chip chip-late" data-filter="late">Late <span class="chip-count" data-count="late">0</span></button>
+      <button class="chip" data-filter="ship">Ship <span class="chip-count" data-count="ship">0</span></button>
+    </div>
+
+    <div id="list" class="list"></div>
+
+    <div id="empty" class="empty hidden">
+      <h3>No orders yet</h3>
+      <p>Paste an order URL or add manually to start tracking.</p>
+      <button id="btn-add-empty" class="btn-primary">＋ Add first order</button>
+    </div>
+
+    <div class="add-bar">
+      <button id="btn-paste" class="btn-paste" title="Paste an Etsy or Shopify order URL">📋 Paste URL</button>
+      <button id="btn-add" class="btn-primary btn-grow">＋ New order</button>
+    </div>
+
+    <footer>
+      <span class="footer-meta">Local-first · No subscription</span>
+      <span class="footer-meta-r"><span id="paid-badge"></span></span>
+    </footer>
+  </div>
+
+  <!-- Add / Edit Drawer -->
+  <div id="edit-view" class="hidden">
+    <header>
+      <button id="btn-back" class="btn-link">← Back</button>
+      <h2 id="edit-title">New order</h2>
+    </header>
+    <div class="edit-body">
+      <label class="field">
+        <span>Paste Etsy / Shopify order URL <span class="optional">(optional)</span></span>
+        <input id="f-url" type="text" placeholder="https://www.etsy.com/your/orders/sold/...">
+      </label>
+      <label class="field">
+        <span>Order #</span>
+        <input id="f-orderNo" type="text" placeholder="e.g. 1234567890">
+      </label>
+      <label class="field">
+        <span>Buyer</span>
+        <input id="f-customer" type="text" placeholder="e.g. Jane D.">
+      </label>
+      <label class="field">
+        <span>Custom request</span>
+        <textarea id="f-request" rows="3" placeholder="e.g. Engrave 'Mom 2026' in Script font, gift wrap"></textarea>
+      </label>
+      <label class="field">
+        <span>Due date</span>
+        <input id="f-dueDate" type="date">
+      </label>
+      <div class="edit-actions">
+        <button id="btn-cancel" class="btn-secondary">Cancel</button>
+        <button id="btn-save" class="btn-primary">Save</button>
+      </div>
+      <button id="btn-delete" class="btn-link btn-danger hidden">Delete this order</button>
+    </div>
+  </div>
+
+  <!-- Detail / Checklist View -->
+  <div id="detail-view" class="hidden">
+    <header>
+      <button id="btn-detail-back" class="btn-link">← Back</button>
+      <button id="btn-edit" class="btn-link">Edit</button>
+    </header>
+    <div class="detail-body">
+      <div class="detail-meta">
+        <div class="detail-orderno">#<span id="d-orderNo"></span></div>
+        <div class="detail-customer" id="d-customer"></div>
+        <div class="detail-due" id="d-due"></div>
+      </div>
+      <div class="detail-request" id="d-request"></div>
+
+      <div class="status-row" id="status-row"></div>
+      <button id="btn-next" class="btn-primary btn-wide">Next →</button>
+
+      <h4 class="checklist-title">Checklist</h4>
+      <ul id="checklist" class="checklist"></ul>
+    </div>
+  </div>
+
+  <!-- Upgrade modal -->
+  <div id="upgrade-modal" class="hidden">
+    <div class="upgrade-card">
+      <h2>You hit the Free limit</h2>
+      <p>Free plan tracks up to 10 active orders.<br>Unlock unlimited — pay once, yours forever.</p>
+      <ul>
+        <li>Unlimited active orders</li>
+        <li>CSV import & export</li>
+        <li>JSON full backup / restore</li>
+        <li>All future updates</li>
+      </ul>
+      <button id="btn-upgrade" class="btn-primary btn-wide">Upgrade — $12.99 once</button>
+      <button id="btn-upgrade-close" class="btn-secondary btn-wide">Maybe later</button>
+      <p class="upgrade-fineprint">No subscription. No cloud. No account.</p>
+    </div>
+  </div>
+
+  <!-- In-house confirm modal (replaces window.confirm) -->
+  <div id="confirm-modal" class="hidden">
+    <div class="confirm-card">
+      <p id="confirm-text"></p>
+      <div class="confirm-actions">
+        <button id="confirm-no" class="btn-secondary">Cancel</button>
+        <button id="confirm-yes" class="btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="ExtPay.js"></script>
+  <script src="lib/order-utils.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

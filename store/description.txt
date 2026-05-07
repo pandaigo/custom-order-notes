@@ -1,0 +1,111 @@
+==============================
+ストア説明文（Description）
+==============================
+
+The only custom order tracker that's truly yours forever. $12.99 once — no $10/month subscription, no cloud lock-in. Built for Etsy and Shopify sellers who handle 20-200 custom orders a month.
+
+Desktop Chrome only — your buyer notes stay on your PC, never on a server.
+
+▸ Stop scrolling buyer messages at midnight to find what they asked for.
+▸ Local-first. Pay once. Yours forever.
+▸ No account, no sign-up, no subscription.
+
+WHAT IT DOES
+• Save every custom request, deadline, and order status in one place.
+• Get a desktop reminder on the morning of each due date.
+• Track progress across 5 stages: Received → Making → Packing → Shipped → Review.
+• Tick off a per-order checklist so nothing ships half-done.
+• Paste an Etsy or Shopify order page URL — order # and platform fill in automatically.
+• Search by order #, buyer name, or request text.
+• Filter by Today / Late / Ship to focus on what matters this morning.
+
+PRO ($12.99 ONE-TIME)
+• Unlimited active orders (Free tracks up to 10).
+• CSV import — drop in your Etsy or Shopify order export.
+• CSV & JSON export — download a full backup any time.
+• All future updates included.
+
+WHO IT'S FOR
+Custom-order sellers on Etsy, Shopify, Amazon Handmade, eBay, and any marketplace where buyer requests come with personalization details, sizes, colors, or rush deadlines.
+
+DESKTOP ONLY
+Custom Order Notes runs as a Chrome desktop extension. There is no mobile companion app — your data lives on your computer. We recommend doing a JSON backup once a month and importing it on any other PC you use.
+
+MULTI-PC TIP
+Run the same shop from two computers? Export a JSON backup on PC1, drop it into PC2's "Restore from backup" — takes 10 seconds, no cloud sync needed. Your previous data is auto-saved before every restore, so accidental clicks can't wipe your work.
+
+WHY LOCAL-FIRST
+Your buyer notes never leave your computer. No servers. No syncing. No data breaches. If you want to move to a different PC, download a JSON backup and restore it on the other side — done.
+
+MADE BY
+The team behind QuickReply Templates and Watermark Express. We make small, focused buy-once tools for people who are tired of paying $10/month forever for software they barely use.
+
+
+==============================
+ホームページURL
+==============================
+https://pandaigo.github.io/custom-order-notes/
+
+==============================
+サポートURL
+==============================
+https://pandaigo.github.io/custom-order-notes/store/privacy-policy.html
+
+==============================
+単一用途の説明
+==============================
+A local notebook for managing custom order notes with due-date reminders and status tracking, designed for online marketplace sellers.
+
+==============================
+storage が必要な理由
+==============================
+Required to save order notes, due-date schedules, checklists, and user settings locally on the device using chrome.storage.local. No data is sent to any external server.
+
+==============================
+alarms が必要な理由
+==============================
+Required to schedule a single daily check at 9:00 AM that surfaces orders whose due date has arrived or passed, so the seller does not miss a shipping deadline.
+
+==============================
+notifications が必要な理由
+==============================
+Required to display a desktop reminder when an order's due date arrives, allowing the seller to jump back to the order page.
+
+==============================
+ホスト権限が必要な理由（content_scripts の matches）
+==============================
+https://extensionpay.com/*:
+Required by ExtensionPay (the payment provider) to detect when a one-time payment is completed. The ExtPay.js content script runs on the ExtensionPay checkout page to communicate payment status back to the extension.
+
+==============================
+リモートコードを使用しているか
+==============================
+No. This extension does not use any remotely hosted code. All scripts are bundled within the extension package.
+
+==============================
+ユーザーデータの収集について
+==============================
+以下すべてチェックなし（収集しない）:
+- [ ] 個人を特定できる情報
+- [ ] 健康に関する情報
+- [ ] 財務状況や支払いに関する情報
+- [ ] 認証に関する情報
+- [ ] 個人的コミュニケーション
+- [ ] 位置情報
+- [ ] ウェブ履歴
+- [ ] ユーザーのアクティビティ
+- [ ] ウェブサイトのコンテンツ
+
+補足: All data (order notes, customer names, custom requests, due dates, statuses) is stored locally on the user's device using chrome.storage.local. No analytics, tracking, or telemetry is included. No user accounts are required. The only external communication is with ExtensionPay (extensionpay.com) to process one-time payments and verify purchase status.
+
+==============================
+開示の表明（すべてチェックを入れる）
+==============================
+- [x] 私は以下の開示が正しいものであることを表明します。私は、承認されている以外の用途で第三者にユーザーデータを販売、転送しません
+- [x] 私はアイテムの唯一の目的と関係のない目的でユーザーデータを使用または転送しません
+- [x] 私は信用力を判断する目的または融資目的でユーザーデータを使用または転送しません
+
+==============================
+プライバシーポリシーのURL
+==============================
+https://pandaigo.github.io/custom-order-notes/store/privacy-policy.html

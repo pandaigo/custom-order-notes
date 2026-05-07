@@ -1,0 +1,20 @@
+{
+  "name": "custom-order-notes",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "smoke": "node scripts/smoke-test.mjs",
+    "e2e": "node scripts/e2e.mjs",
+    "test": "npm run smoke && npm run e2e",
+    "test-units": "node scripts/test-units.mjs",
+    "zip": "node scripts/zip.mjs",
+    "icons": "node scripts/gen-icons.mjs",
+    "store-assets": "node scripts/gen-store-assets.mjs"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.0.0",
+    "sharp": "^0.33.0"
+  }
+}

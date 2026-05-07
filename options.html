@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Custom Order Notes — Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <div class="brand">
+        <img src="icons/icon48.png" alt="" width="28" height="28">
+        <h1>Custom Order Notes</h1>
+        <span id="paid-pill" class="paid-pill"></span>
+      </div>
+      <div class="brand-meta">Local-first · No subscription · Yours forever</div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="orders">All orders</button>
+      <button class="tab" data-tab="archive">Archive</button>
+      <button class="tab" data-tab="data">Import / Export</button>
+      <button class="tab" data-tab="about">About</button>
+    </nav>
+
+    <!-- Orders -->
+    <section id="tab-orders" class="tab-panel">
+      <div class="toolbar">
+        <input id="orders-search" type="search" placeholder="Search...">
+        <span class="muted" id="orders-summary"></span>
+      </div>
+      <table class="orders-table" id="orders-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Buyer</th>
+            <th>Request</th>
+            <th>Due</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="orders-tbody"></tbody>
+      </table>
+    </section>
+
+    <!-- Archive -->
+    <section id="tab-archive" class="tab-panel hidden">
+      <p class="muted">Archived & shipped orders. Restore to bring an order back to active.</p>
+      <table class="orders-table" id="archive-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Buyer</th>
+            <th>Request</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="archive-tbody"></tbody>
+      </table>
+    </section>
+
+    <!-- Data -->
+    <section id="tab-data" class="tab-panel hidden">
+      <div class="card">
+        <h3>CSV import</h3>
+        <p class="muted">Drop a CSV exported from Etsy (Sold Orders) or Shopify (Orders Export). Column names are matched automatically.</p>
+        <input type="file" id="csv-file" accept=".csv,text/csv">
+        <div id="csv-preview" class="muted hidden"></div>
+        <p class="muted small">Free plan can import up to 10 active orders. Pro: unlimited.</p>
+      </div>
+
+      <div class="card">
+        <h3>CSV export</h3>
+        <p class="muted">Download all orders (active + archived) as CSV.</p>
+        <button id="btn-csv-export" class="btn-primary">Export CSV</button>
+      </div>
+
+      <div class="card">
+        <h3>JSON full backup</h3>
+        <p class="muted">Download or restore a full snapshot — useful for moving between PCs (no cloud needed).</p>
+        <div class="row-buttons">
+          <button id="btn-json-export" class="btn-primary">Download backup</button>
+          <input type="file" id="json-file" accept=".json,application/json" hidden>
+          <button id="btn-json-import" class="btn-secondary">Restore from backup</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="danger">Danger zone</h3>
+        <p class="muted">Permanently delete all orders. This cannot be undone.</p>
+        <button id="btn-clear-all" class="btn-danger">Delete everything</button>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="tab-about" class="tab-panel hidden">
+      <div class="card">
+        <h3>About</h3>
+        <p>Custom Order Notes keeps every buyer request, deadline, and status in one place — entirely on your device. No account. No cloud sync. No subscription.</p>
+        <p class="muted small">Compatible with Etsy, Shopify, Amazon Handmade, eBay, and any marketplace where you handle custom orders.</p>
+      </div>
+      <div class="card">
+        <h3>Also by this developer</h3>
+        <ul class="related">
+          <li><strong>QuickReply Templates</strong> — canned responses & text expander</li>
+          <li><strong>Watermark Express</strong> — bulk image watermark</li>
+          <li><strong>Quick Contact Notes</strong> — personal CRM with reminders</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Pro version</h3>
+        <p>Free tracks up to 10 active orders. Upgrade once for unlimited orders, CSV import, and JSON backup.</p>
+        <button id="btn-options-upgrade" class="btn-primary">Upgrade — $12.99 once</button>
+        <p class="muted small">No subscription. No cloud. Pay once, yours forever.</p>
+      </div>
+    </section>
+
+    <!-- Confirm modal (in-house) -->
+    <div id="confirm-modal" class="modal hidden">
+      <div class="modal-card">
+        <p id="confirm-text"></p>
+        <div class="modal-actions">
+          <button id="confirm-no" class="btn-secondary">Cancel</button>
+          <button id="confirm-yes" class="btn-primary">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import preview modal -->
+    <div id="import-modal" class="modal hidden">
+      <div class="modal-card wide">
+        <h3 id="import-title">Import preview</h3>
+        <p id="import-summary" class="muted"></p>
+        <div id="import-list" class="import-list"></div>
+        <div class="modal-actions">
+          <button id="import-cancel" class="btn-secondary">Cancel</button>
+          <button id="import-confirm" class="btn-primary">Import</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  </div>
+
+  <script src="ExtPay.js"></script>
+  <script src="lib/order-utils.js"></script>
+  <script src="lib/csv-utils.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
