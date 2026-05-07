@@ -300,6 +300,14 @@ function renderDetail() {
   $('#btn-next').textContent = nextLabel + ' →';
   $('#btn-next').dataset.nextAction = isLast ? 'archive' : 'next';
 
+  // 戻すボタン: 最初のステータス (received) では無効化
+  const isFirst = O.STATUSES.indexOf(n.status) <= 0;
+  const prevBtn = $('#btn-prev');
+  prevBtn.disabled = isFirst;
+  prevBtn.title = isFirst
+    ? 'Already at the first status'
+    : `Move back to ${O.STATUS_LABELS[O.prevStatus(n.status)]}`;
+
   // checklist
   const cl = $('#checklist');
   cl.innerHTML = (n.checklist || []).map((item, i) => `
@@ -340,6 +348,17 @@ async function advanceStatus() {
   } catch (e) {
     showToast('Save failed, retry');
   }
+}
+
+async function regressStatus() {
+  const n = state.notes.find(x => x.id === state.detailId);
+  if (!n) return;
+  if (O.STATUSES.indexOf(n.status) <= 0) return;
+  // 楽観的更新
+  n.status = O.prevStatus(n.status);
+  n.updatedAt = new Date().toISOString();
+  renderDetail();
+  try { await saveNotes(); } catch (_) { showToast('Save failed, retry'); }
 }
 
 async function toggleChecklistItem(idx) {
@@ -495,6 +514,7 @@ function bindEvents() {
   $('#btn-detail-back').addEventListener('click', () => { state.view = 'main'; render(); });
   $('#btn-edit').addEventListener('click', () => openEdit(state.detailId));
   $('#btn-next').addEventListener('click', advanceStatus);
+  $('#btn-prev').addEventListener('click', regressStatus);
   $('#checklist').addEventListener('click', (e) => {
     const li = e.target.closest('li');
     if (!li) return;

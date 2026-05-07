@@ -12,7 +12,7 @@
         <h1>Custom Order Notes</h1>
       </div>
       <div class="header-right">
-        <button id="btn-options" class="btn-icon-ghost" title="Open all orders / settings">⚙</button>
+        <button id="btn-options" class="btn-options" title="Open all orders, archive, import / export">⚙ All orders</button>
       </div>
     </header>
 
@@ -97,7 +97,10 @@
       <div class="detail-request" id="d-request"></div>
 
       <div class="status-row" id="status-row"></div>
-      <button id="btn-next" class="btn-primary btn-wide">Next →</button>
+      <div class="status-actions">
+        <button id="btn-prev" class="btn-secondary btn-prev" title="Move back one status">←</button>
+        <button id="btn-next" class="btn-primary btn-grow">Next →</button>
+      </div>
 
       <h4 class="checklist-title">Checklist</h4>
       <ul id="checklist" class="checklist"></ul>

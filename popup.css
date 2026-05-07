@@ -86,6 +86,28 @@ header h2 {
 
 .btn-icon-ghost:hover { background: var(--bg-alt); color: var(--text); }
 
+/* options への動線をテキスト付きで明示化（歯車だけだと見落とされやすい） */
+.btn-options {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: var(--bg-soft);
+  color: var(--text-soft);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-options:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
 /* Search */
 .search-row {
   display: flex;
@@ -455,6 +477,23 @@ footer {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--primary);
+}
+
+.status-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-prev {
+  flex: 0 0 44px;
+  font-size: 16px;
+  padding: 8px 0;
+  font-weight: 600;
+}
+
+.btn-prev:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .checklist-title {
