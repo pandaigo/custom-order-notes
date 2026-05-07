@@ -36,8 +36,12 @@ eq(O.parseOrderUrl('https://www.etsy.com/your/orders/sold/transaction:3987654321
    { platform: 'etsy', orderNo: '3987654321' }, 'Etsy transaction: prefix');
 eq(O.parseOrderUrl('https://admin.shopify.com/store/my-shop/orders/5123456789'),
    { platform: 'shopify', orderNo: '5123456789' }, 'Shopify modern admin URL');
+eq(O.parseOrderUrl('https://admin.shopify.com/orders/5123456789'),
+   { platform: 'shopify', orderNo: '5123456789' }, 'Shopify shortcut URL (no store path)');
 eq(O.parseOrderUrl('https://my-shop.myshopify.com/admin/orders/5123456789'),
    { platform: 'shopify', orderNo: '5123456789' }, 'Shopify legacy admin URL');
+eq(O.parseOrderUrl('https://admin.shopify.com/store/my-shop/draft_orders/123456789'),
+   null, 'Shopify draft_orders URL is rejected');
 eq(O.parseOrderUrl('https://example.com/order/12345'),
    null, 'Unrelated URL returns null');
 eq(O.parseOrderUrl(''),
